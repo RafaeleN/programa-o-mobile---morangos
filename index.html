@@ -1,0 +1,898 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Strawberry - Produtos Premium de Morango</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .serif-font {
+            font-family: 'Playfair Display', serif;
+        }
+        
+        .strawberry-gradient {
+            background: linear-gradient(135deg, #FF6B6B 0%, #FF8E8E 25%, #FFB3B3 50%, #FFC1C1 75%, #FFE4E4 100%);
+        }
+        
+        .peach-gradient {
+            background: linear-gradient(135deg, #FFCCCB 0%, #FFE4E1 50%, #FFF0F5 100%);
+        }
+        
+        .product-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 107, 107, 0.2);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .product-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(255, 107, 107, 0.2);
+            border-color: rgba(255, 107, 107, 0.4);
+        }
+        
+        .strawberry-button {
+            background: linear-gradient(135deg, #FF6B6B, #FF8E8E);
+            color: white;
+            border: none;
+            padding: 12px 32px;
+            border-radius: 50px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .strawberry-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(255, 107, 107, 0.3);
+        }
+        
+        .strawberry-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.5s;
+        }
+        
+        .strawberry-button:hover::before {
+            left: 100%;
+        }
+        
+        .page {
+            display: none;
+        }
+        
+        .page.active {
+            display: block;
+        }
+        
+        .nav-link {
+            transition: all 0.3s ease;
+            position: relative;
+            padding: 8px 20px;
+            border-radius: 25px;
+        }
+        
+        .nav-link:hover,
+        .nav-link.active {
+            background: rgba(255, 107, 107, 0.1);
+            color: #FF6B6B;
+        }
+        
+        .strawberry-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #FF6B6B, #FF8E8E);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.8s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .hero-strawberry {
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400"><defs><radialGradient id="strawberry" cx="50%" cy="30%"><stop offset="0%" style="stop-color:%23FF6B6B"/><stop offset="100%" style="stop-color:%23DC143C"/></radialGradient></defs><path d="M200 50 C250 50 300 100 300 180 C300 280 200 350 200 350 C200 350 100 280 100 180 C100 100 150 50 200 50 Z" fill="url(%23strawberry)"/><ellipse cx="180" cy="120" rx="3" ry="4" fill="%23228B22"/><ellipse cx="220" cy="130" rx="3" ry="4" fill="%23228B22"/><ellipse cx="200" cy="150" rx="3" ry="4" fill="%23228B22"/><ellipse cx="170" cy="160" rx="3" ry="4" fill="%23228B22"/><ellipse cx="230" cy="170" rx="3" ry="4" fill="%23228B22"/><ellipse cx="190" cy="190" rx="3" ry="4" fill="%23228B22"/><ellipse cx="210" cy="210" rx="3" ry="4" fill="%23228B22"/><path d="M180 40 Q200 20 220 40 Q210 50 200 45 Q190 50 180 40" fill="%23228B22"/></svg>') no-repeat center;
+            background-size: contain;
+            width: 300px;
+            height: 300px;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            backdrop-filter: blur(5px);
+        }
+        
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 20px;
+            max-width: 500px;
+            width: 90%;
+            position: relative;
+            animation: modalSlideIn 0.3s ease-out;
+        }
+        
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-50px) scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+        
+        .close-modal {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 28px;
+            font-weight: bold;
+            color: #aaa;
+            cursor: pointer;
+        }
+        
+        .close-modal:hover {
+            color: #FF6B6B;
+        }
+    </style>
+</head>
+<body class="min-h-screen peach-gradient">
+    <!-- Header -->
+    <header class="bg-white/90 backdrop-blur-md shadow-lg sticky top-0 z-50">
+        <div class="container mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4 cursor-pointer" onclick="showPage('home')">
+                    <div class="strawberry-icon">🍓</div>
+                    <div>
+                        <h1 class="text-3xl font-bold text-gray-800 serif-font">Strawberry</h1>
+                        <p class="text-sm text-gray-600">Premium Products</p>
+                    </div>
+                </div>
+                <nav class="flex space-x-2">
+                    <a href="#" class="nav-link text-gray-700 hover:text-red-500 font-medium active" onclick="showPage('home')">Home</a>
+                    <a href="#" class="nav-link text-gray-700 hover:text-red-500 font-medium" onclick="showPage('products')">Products</a>
+                    <a href="#" class="nav-link text-gray-700 hover:text-red-500 font-medium" onclick="showPage('purchased')">Purchased</a>
+                    <a href="#" class="nav-link text-gray-700 hover:text-red-500 font-medium" onclick="showPage('contact')">Contact</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- HOME PAGE -->
+    <div id="home" class="page active">
+        <!-- Hero Section -->
+        <section class="py-20 relative overflow-hidden">
+            <div class="container mx-auto px-6">
+                <div class="grid lg:grid-cols-2 gap-16 items-center">
+                    <div class="fade-in">
+                        <h2 class="text-6xl font-bold text-gray-800 mb-6 serif-font leading-tight">
+                            Premium
+                            <span class="text-red-500">Strawberry</span>
+                            Products
+                        </h2>
+                        <p class="text-xl text-gray-600 mb-8 leading-relaxed">
+                            Discover our exclusive collection of strawberry-based products, 
+                            from fresh preserves to luxurious skincare items. 
+                            Each product is crafted with the finest strawberries.
+                        </p>
+                        <div class="flex flex-col sm:flex-row gap-4">
+                            <button onclick="showPage('products')" class="strawberry-button text-lg">
+                                Explore Products
+                            </button>
+                            <button onclick="openModal('customerModal')" class="bg-white text-red-500 border-2 border-red-500 px-8 py-3 rounded-full font-semibold hover:bg-red-50 transition-all duration-300">
+                                Customer Info
+                            </button>
+                        </div>
+                    </div>
+                    <div class="flex justify-center">
+                        <div class="hero-strawberry"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Featured Products -->
+        <section class="py-20">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-16">
+                    <h3 class="text-4xl font-bold text-gray-800 mb-4 serif-font">Featured Products</h3>
+                    <p class="text-xl text-gray-600">Our most popular strawberry creations</p>
+                </div>
+                
+                <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+                    <div class="product-card rounded-3xl p-6 text-center">
+                        <div class="w-20 h-20 strawberry-gradient rounded-full flex items-center justify-center mx-auto mb-4 text-2xl text-white font-bold">
+                            🍯
+                        </div>
+                        <h4 class="text-xl font-semibold text-gray-800 mb-2">Strawberry Jam</h4>
+                        <p class="text-gray-600 mb-4">Premium homemade jam</p>
+                        <p class="text-2xl font-bold text-red-500">$24.99</p>
+                    </div>
+                    
+                    <div class="product-card rounded-3xl p-6 text-center">
+                        <div class="w-20 h-20 strawberry-gradient rounded-full flex items-center justify-center mx-auto mb-4 text-2xl text-white font-bold">
+                            🧴
+                        </div>
+                        <h4 class="text-xl font-semibold text-gray-800 mb-2">Face Cream</h4>
+                        <p class="text-gray-600 mb-4">Strawberry extract skincare</p>
+                        <p class="text-2xl font-bold text-red-500">$39.99</p>
+                    </div>
+                    
+                    <div class="product-card rounded-3xl p-6 text-center">
+                        <div class="w-20 h-20 strawberry-gradient rounded-full flex items-center justify-center mx-auto mb-4 text-2xl text-white font-bold">
+                            🥤
+                        </div>
+                        <h4 class="text-xl font-semibold text-gray-800 mb-2">Strawberry Juice</h4>
+                        <p class="text-gray-600 mb-4">100% natural juice</p>
+                        <p class="text-2xl font-bold text-red-500">$12.99</p>
+                    </div>
+                    
+                    <div class="product-card rounded-3xl p-6 text-center">
+                        <div class="w-20 h-20 strawberry-gradient rounded-full flex items-center justify-center mx-auto mb-4 text-2xl text-white font-bold">
+                            🍰
+                        </div>
+                        <h4 class="text-xl font-semibold text-gray-800 mb-2">Strawberry Cake</h4>
+                        <p class="text-gray-600 mb-4">Fresh baked daily</p>
+                        <p class="text-2xl font-bold text-red-500">$29.99</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- PRODUCTS PAGE -->
+    <div id="products" class="page">
+        <section class="py-20">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-16">
+                    <h2 class="text-5xl font-bold text-gray-800 mb-4 serif-font">Our Products</h2>
+                    <p class="text-xl text-gray-600">Premium strawberry products for every taste</p>
+                </div>
+
+                <!-- Product Categories -->
+                <div class="grid lg:grid-cols-3 gap-12 mb-16">
+                    <!-- Food Products -->
+                    <div class="product-card rounded-3xl p-8">
+                        <h3 class="text-3xl font-bold text-red-500 mb-6 serif-font text-center">Food & Beverages</h3>
+                        <div class="space-y-6">
+                            <div class="flex items-center justify-between p-4 bg-red-50 rounded-2xl">
+                                <div class="flex items-center space-x-4">
+                                    <span class="text-2xl">🍯</span>
+                                    <div>
+                                        <h4 class="font-semibold text-gray-800">Strawberry Jam</h4>
+                                        <p class="text-sm text-gray-600">Homemade premium jam</p>
+                                    </div>
+                                </div>
+                                <span class="text-xl font-bold text-red-500">$24.99</span>
+                            </div>
+                            
+                            <div class="flex items-center justify-between p-4 bg-red-50 rounded-2xl">
+                                <div class="flex items-center space-x-4">
+                                    <span class="text-2xl">🥤</span>
+                                    <div>
+                                        <h4 class="font-semibold text-gray-800">Fresh Juice</h4>
+                                        <p class="text-sm text-gray-600">100% natural strawberry</p>
+                                    </div>
+                                </div>
+                                <span class="text-xl font-bold text-red-500">$12.99</span>
+                            </div>
+                            
+                            <div class="flex items-center justify-between p-4 bg-red-50 rounded-2xl">
+                                <div class="flex items-center space-x-4">
+                                    <span class="text-2xl">🍰</span>
+                                    <div>
+                                        <h4 class="font-semibold text-gray-800">Strawberry Cake</h4>
+                                        <p class="text-sm text-gray-600">Fresh baked daily</p>
+                                    </div>
+                                </div>
+                                <span class="text-xl font-bold text-red-500">$29.99</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Skincare Products -->
+                    <div class="product-card rounded-3xl p-8">
+                        <h3 class="text-3xl font-bold text-pink-500 mb-6 serif-font text-center">Skincare</h3>
+                        <div class="space-y-6">
+                            <div class="flex items-center justify-between p-4 bg-pink-50 rounded-2xl">
+                                <div class="flex items-center space-x-4">
+                                    <span class="text-2xl">🧴</span>
+                                    <div>
+                                        <h4 class="font-semibold text-gray-800">Face Cream</h4>
+                                        <p class="text-sm text-gray-600">Anti-aging formula</p>
+                                    </div>
+                                </div>
+                                <span class="text-xl font-bold text-pink-500">$39.99</span>
+                            </div>
+                            
+                            <div class="flex items-center justify-between p-4 bg-pink-50 rounded-2xl">
+                                <div class="flex items-center space-x-4">
+                                    <span class="text-2xl">🧼</span>
+                                    <div>
+                                        <h4 class="font-semibold text-gray-800">Body Soap</h4>
+                                        <p class="text-sm text-gray-600">Natural ingredients</p>
+                                    </div>
+                                </div>
+                                <span class="text-xl font-bold text-pink-500">$18.99</span>
+                            </div>
+                            
+                            <div class="flex items-center justify-between p-4 bg-pink-50 rounded-2xl">
+                                <div class="flex items-center space-x-4">
+                                    <span class="text-2xl">💄</span>
+                                    <div>
+                                        <h4 class="font-semibold text-gray-800">Lip Balm</h4>
+                                        <p class="text-sm text-gray-600">Moisturizing formula</p>
+                                    </div>
+                                </div>
+                                <span class="text-xl font-bold text-pink-500">$9.99</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Gift Sets -->
+                    <div class="product-card rounded-3xl p-8">
+                        <h3 class="text-3xl font-bold text-purple-500 mb-6 serif-font text-center">Gift Sets</h3>
+                        <div class="space-y-6">
+                            <div class="flex items-center justify-between p-4 bg-purple-50 rounded-2xl">
+                                <div class="flex items-center space-x-4">
+                                    <span class="text-2xl">🎁</span>
+                                    <div>
+                                        <h4 class="font-semibold text-gray-800">Deluxe Set</h4>
+                                        <p class="text-sm text-gray-600">Complete collection</p>
+                                    </div>
+                                </div>
+                                <span class="text-xl font-bold text-purple-500">$89.99</span>
+                            </div>
+                            
+                            <div class="flex items-center justify-between p-4 bg-purple-50 rounded-2xl">
+                                <div class="flex items-center space-x-4">
+                                    <span class="text-2xl">🛍️</span>
+                                    <div>
+                                        <h4 class="font-semibold text-gray-800">Starter Pack</h4>
+                                        <p class="text-sm text-gray-600">Perfect for beginners</p>
+                                    </div>
+                                </div>
+                                <span class="text-xl font-bold text-purple-500">$49.99</span>
+                            </div>
+                            
+                            <div class="flex items-center justify-between p-4 bg-purple-50 rounded-2xl">
+                                <div class="flex items-center space-x-4">
+                                    <span class="text-2xl">💝</span>
+                                    <div>
+                                        <h4 class="font-semibold text-gray-800">Holiday Special</h4>
+                                        <p class="text-sm text-gray-600">Limited edition</p>
+                                    </div>
+                                </div>
+                                <span class="text-xl font-bold text-purple-500">$69.99</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Call to Action -->
+                <div class="text-center">
+                    <button onclick="showPage('contact')" class="strawberry-button text-xl px-12 py-4">
+                        Order Now
+                    </button>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- PURCHASED PAGE -->
+    <div id="purchased" class="page">
+        <section class="py-20">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-16">
+                    <h2 class="text-5xl font-bold text-gray-800 mb-4 serif-font">Purchased Items</h2>
+                    <p class="text-xl text-gray-600">Your strawberry product collection</p>
+                </div>
+
+                <!-- Purchased Products Grid -->
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
+                    <div class="product-card rounded-3xl p-6">
+                        <div class="w-full h-48 strawberry-gradient rounded-2xl flex items-center justify-center mb-4 text-4xl text-white">
+                            🍯
+                        </div>
+                        <h3 class="text-2xl font-bold text-gray-800 mb-2">Ourdectar</h3>
+                        <p class="text-gray-600 mb-4">Strawwarrecete ciden latte akipoeck premium strawberry preserve with natural ingredients</p>
+                        <div class="flex justify-between items-center">
+                            <span class="text-2xl font-bold text-red-500">$24.99</span>
+                            <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-semibold">Delivered</span>
+                        </div>
+                    </div>
+
+                    <div class="product-card rounded-3xl p-6">
+                        <div class="w-full h-48 bg-gradient-to-br from-pink-400 to-pink-600 rounded-2xl flex items-center justify-center mb-4 text-4xl text-white">
+                            🧴
+                        </div>
+                        <h3 class="text-2xl font-bold text-gray-800 mb-2">Arbutecty</h3>
+                        <p class="text-gray-600 mb-4">Luxurious strawberry extract face cream with anti-aging properties and natural moisturizers</p>
+                        <div class="flex justify-between items-center">
+                            <span class="text-2xl font-bold text-pink-500">$39.99</span>
+                            <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-semibold">Delivered</span>
+                        </div>
+                    </div>
+
+                    <div class="product-card rounded-3xl p-6">
+                        <div class="w-full h-48 bg-gradient-to-br from-red-400 to-red-600 rounded-2xl flex items-center justify-center mb-4 text-4xl text-white">
+                            🥤
+                        </div>
+                        <h3 class="text-2xl font-bold text-gray-800 mb-2">Grapotty</h3>
+                        <p class="text-gray-600 mb-4">Fresh strawberry juice blend with natural sweeteners and vitamin C enrichment</p>
+                        <div class="flex justify-between items-center">
+                            <span class="text-2xl font-bold text-red-500">$12.99</span>
+                            <span class="bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-sm font-semibold">Shipping</span>
+                        </div>
+                    </div>
+
+                    <div class="product-card rounded-3xl p-6">
+                        <div class="w-full h-48 bg-gradient-to-br from-purple-400 to-purple-600 rounded-2xl flex items-center justify-center mb-4 text-4xl text-white">
+                            🍰
+                        </div>
+                        <h3 class="text-2xl font-bold text-gray-800 mb-2">Strawberry Coun</h3>
+                        <p class="text-gray-600 mb-4">Artisanal strawberry cake with fresh cream and seasonal berry toppings</p>
+                        <div class="flex justify-between items-center">
+                            <span class="text-2xl font-bold text-purple-500">$29.99</span>
+                            <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-semibold">Delivered</span>
+                        </div>
+                    </div>
+
+                    <div class="product-card rounded-3xl p-6">
+                        <div class="w-full h-48 bg-gradient-to-br from-orange-400 to-orange-600 rounded-2xl flex items-center justify-center mb-4 text-4xl text-white">
+                            🧼
+                        </div>
+                        <h3 class="text-2xl font-bold text-gray-800 mb-2">Trawlenttr Sviest</h3>
+                        <p class="text-gray-600 mb-4">Natural strawberry body soap with organic ingredients and moisturizing formula</p>
+                        <div class="flex justify-between items-center">
+                            <span class="text-2xl font-bold text-orange-500">$18.99</span>
+                            <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-semibold">Processing</span>
+                        </div>
+                    </div>
+
+                    <div class="product-card rounded-3xl p-6">
+                        <div class="w-full h-48 bg-gradient-to-br from-green-400 to-green-600 rounded-2xl flex items-center justify-center mb-4 text-4xl text-white">
+                            🎁
+                        </div>
+                        <h3 class="text-2xl font-bold text-gray-800 mb-2">Deluxe Bundle</h3>
+                        <p class="text-gray-600 mb-4">Complete strawberry product collection with premium packaging and exclusive items</p>
+                        <div class="flex justify-between items-center">
+                            <span class="text-2xl font-bold text-green-500">$89.99</span>
+                            <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-semibold">Delivered</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Order Summary -->
+                <div class="max-w-2xl mx-auto">
+                    <div class="product-card rounded-3xl p-8">
+                        <h3 class="text-3xl font-bold text-gray-800 mb-6 serif-font text-center">Order Summary</h3>
+                        <div class="space-y-4 mb-6">
+                            <div class="flex justify-between items-center py-2 border-b border-gray-200">
+                                <span class="text-gray-600">Total Items:</span>
+                                <span class="font-semibold">6 products</span>
+                            </div>
+                            <div class="flex justify-between items-center py-2 border-b border-gray-200">
+                                <span class="text-gray-600">Subtotal:</span>
+                                <span class="font-semibold">$215.94</span>
+                            </div>
+                            <div class="flex justify-between items-center py-2 border-b border-gray-200">
+                                <span class="text-gray-600">Shipping:</span>
+                                <span class="font-semibold text-green-600">Free</span>
+                            </div>
+                            <div class="flex justify-between items-center py-2 text-xl font-bold">
+                                <span>Total:</span>
+                                <span class="text-red-500">$215.94</span>
+                            </div>
+                        </div>
+                        <div class="text-center">
+                            <button onclick="showPage('products')" class="strawberry-button text-lg px-8 py-3">
+                                Continue Shopping
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- CONTACT PAGE -->
+    <div id="contact" class="page">
+        <section class="py-20">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-16">
+                    <h2 class="text-5xl font-bold text-gray-800 mb-4 serif-font">Contact Us</h2>
+                    <p class="text-xl text-gray-600">Get in touch with our strawberry experts</p>
+                </div>
+
+                <div class="grid lg:grid-cols-2 gap-16">
+                    <!-- Contact Form -->
+                    <div class="product-card rounded-3xl p-8">
+                        <h3 class="text-3xl font-bold text-red-500 mb-6 serif-font">Send us a Message</h3>
+                        
+                        <form class="space-y-6" onsubmit="handleContactSubmit(event)">
+                            <div class="grid md:grid-cols-2 gap-6">
+                                <div>
+                                    <label class="block text-gray-700 font-semibold mb-2">First Name</label>
+                                    <input type="text" required 
+                                           class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-red-500 focus:outline-none transition-all duration-300"
+                                           placeholder="Your first name">
+                                </div>
+                                <div>
+                                    <label class="block text-gray-700 font-semibold mb-2">Last Name</label>
+                                    <input type="text" required 
+                                           class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-red-500 focus:outline-none transition-all duration-300"
+                                           placeholder="Your last name">
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-gray-700 font-semibold mb-2">Email Address</label>
+                                <input type="email" required 
+                                       class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-red-500 focus:outline-none transition-all duration-300"
+                                       placeholder="your@email.com">
+                            </div>
+                            
+                            <div>
+                                <label class="block text-gray-700 font-semibold mb-2">Phone Number</label>
+                                <input type="tel" 
+                                       class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-red-500 focus:outline-none transition-all duration-300"
+                                       placeholder="+1 (555) 123-4567">
+                            </div>
+                            
+                            <div>
+                                <label class="block text-gray-700 font-semibold mb-2">Subject</label>
+                                <select class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-red-500 focus:outline-none transition-all duration-300">
+                                    <option>Product Inquiry</option>
+                                    <option>Order Support</option>
+                                    <option>Wholesale Partnership</option>
+                                    <option>General Question</option>
+                                    <option>Feedback</option>
+                                </select>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-gray-700 font-semibold mb-2">Message</label>
+                                <textarea required rows="5" 
+                                          class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-red-500 focus:outline-none transition-all duration-300 resize-none"
+                                          placeholder="Tell us how we can help you..."></textarea>
+                            </div>
+                            
+                            <button type="submit" class="w-full strawberry-button text-lg py-4">
+                                Send Message
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Contact Information -->
+                    <div class="space-y-8">
+                        <!-- Contact Details -->
+                        <div class="product-card rounded-3xl p-8">
+                            <h3 class="text-2xl font-bold text-gray-800 mb-6">Get in Touch</h3>
+                            
+                            <div class="space-y-6">
+                                <div class="flex items-start space-x-4">
+                                    <div class="w-12 h-12 strawberry-gradient rounded-full flex items-center justify-center text-white font-bold">
+                                        📍
+                                    </div>
+                                    <div>
+                                        <h4 class="font-semibold text-gray-800 mb-1">Address</h4>
+                                        <p class="text-gray-600">123 Strawberry Lane<br>Berry Hills, CA 90210<br>United States</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex items-start space-x-4">
+                                    <div class="w-12 h-12 strawberry-gradient rounded-full flex items-center justify-center text-white font-bold">
+                                        📞
+                                    </div>
+                                    <div>
+                                        <h4 class="font-semibold text-gray-800 mb-1">Phone</h4>
+                                        <p class="text-gray-600">+1 (555) 123-4567<br>+1 (555) 987-6543</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex items-start space-x-4">
+                                    <div class="w-12 h-12 strawberry-gradient rounded-full flex items-center justify-center text-white font-bold">
+                                        ✉️
+                                    </div>
+                                    <div>
+                                        <h4 class="font-semibold text-gray-800 mb-1">Email</h4>
+                                        <p class="text-gray-600">info@strawberry.com<br>support@strawberry.com</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Business Hours -->
+                        <div class="product-card rounded-3xl p-8">
+                            <h3 class="text-2xl font-bold text-gray-800 mb-6">Business Hours</h3>
+                            
+                            <div class="space-y-4">
+                                <div class="flex justify-between items-center py-2 border-b border-gray-200">
+                                    <span class="font-medium text-gray-700">Monday - Friday</span>
+                                    <span class="text-gray-600">9:00 AM - 6:00 PM</span>
+                                </div>
+                                <div class="flex justify-between items-center py-2 border-b border-gray-200">
+                                    <span class="font-medium text-gray-700">Saturday</span>
+                                    <span class="text-gray-600">10:00 AM - 4:00 PM</span>
+                                </div>
+                                <div class="flex justify-between items-center py-2">
+                                    <span class="font-medium text-gray-700">Sunday</span>
+                                    <span class="text-gray-600">Closed</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Social Media -->
+                        <div class="product-card rounded-3xl p-8">
+                            <h3 class="text-2xl font-bold text-gray-800 mb-6">Follow Us</h3>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div class="bg-blue-100 rounded-2xl p-4 text-center">
+                                    <span class="text-3xl mb-2 block">📘</span>
+                                    <h4 class="font-semibold text-blue-800">Facebook</h4>
+                                </div>
+                                <div class="bg-pink-100 rounded-2xl p-4 text-center">
+                                    <span class="text-3xl mb-2 block">📷</span>
+                                    <h4 class="font-semibold text-pink-800">Instagram</h4>
+                                </div>
+                                <div class="bg-blue-100 rounded-2xl p-4 text-center">
+                                    <span class="text-3xl mb-2 block">🐦</span>
+                                    <h4 class="font-semibold text-blue-800">Twitter</h4>
+                                </div>
+                                <div class="bg-red-100 rounded-2xl p-4 text-center">
+                                    <span class="text-3xl mb-2 block">📺</span>
+                                    <h4 class="font-semibold text-red-800">YouTube</h4>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Customer Info Modal -->
+    <div id="customerModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal('customerModal')">&times;</span>
+            <h3 class="text-3xl font-bold text-red-500 mb-6 serif-font">Customer Information</h3>
+            
+            <form class="space-y-6" onsubmit="handleCustomerInfo(event)">
+                <div>
+                    <label class="block text-gray-700 font-semibold mb-2">Auracard Number</label>
+                    <input type="text" 
+                           class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-red-500 focus:outline-none transition-all duration-300"
+                           placeholder="Enter your Auracard number">
+                </div>
+                
+                <div>
+                    <label class="block text-gray-700 font-semibold mb-2">Retch Code</label>
+                    <input type="text" 
+                           class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-red-500 focus:outline-none transition-all duration-300"
+                           placeholder="Your unique Retch code">
+                </div>
+                
+                <div>
+                    <label class="block text-gray-700 font-semibold mb-2">Seet Toth Preference</label>
+                    <select class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-red-500 focus:outline-none transition-all duration-300">
+                        <option>Sweet Preference</option>
+                        <option>Mild Preference</option>
+                        <option>Natural Preference</option>
+                        <option>Custom Preference</option>
+                    </select>
+                </div>
+                
+                <div class="flex gap-4">
+                    <button type="submit" class="flex-1 strawberry-button">
+                        Submit Info
+                    </button>
+                    <button type="button" onclick="closeModal('customerModal')" 
+                            class="flex-1 bg-gray-200 text-gray-700 px-6 py-3 rounded-full font-semibold hover:bg-gray-300 transition-all duration-300">
+                        Cancel
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-white/90 backdrop-blur-md py-16 mt-20">
+        <div class="container mx-auto px-6">
+            <div class="grid lg:grid-cols-4 gap-12">
+                <div>
+                    <div class="flex items-center space-x-4 mb-6">
+                        <div class="strawberry-icon">🍓</div>
+                        <div>
+                            <h3 class="text-2xl font-bold text-gray-800 serif-font">Strawberry</h3>
+                            <p class="text-gray-600">Premium Products</p>
+                        </div>
+                    </div>
+                    <p class="text-gray-600 leading-relaxed">Creating premium strawberry products with love and dedication since 2020.</p>
+                </div>
+                <div>
+                    <h4 class="text-xl font-bold text-gray-800 mb-6">Quick Links</h4>
+                    <ul class="space-y-3 text-gray-600">
+                        <li><a href="#" onclick="showPage('home')" class="hover:text-red-500 transition-colors">Home</a></li>
+                        <li><a href="#" onclick="showPage('products')" class="hover:text-red-500 transition-colors">Products</a></li>
+                        <li><a href="#" onclick="showPage('purchased')" class="hover:text-red-500 transition-colors">Purchased</a></li>
+                        <li><a href="#" onclick="showPage('contact')" class="hover:text-red-500 transition-colors">Contact</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-xl font-bold text-gray-800 mb-6">Products</h4>
+                    <ul class="space-y-3 text-gray-600">
+                        <li>Food & Beverages</li>
+                        <li>Skincare Products</li>
+                        <li>Gift Sets</li>
+                        <li>Seasonal Items</li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-xl font-bold text-gray-800 mb-6">Contact Info</h4>
+                    <ul class="space-y-3 text-gray-600">
+                        <li>📍 123 Strawberry Lane</li>
+                        <li>📞 +1 (555) 123-4567</li>
+                        <li>✉️ info@strawberry.com</li>
+                        <li>🕒 Mon-Fri: 9AM-6PM</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-gray-200 mt-12 pt-8 text-center">
+                <p class="text-gray-600">© 2024 Strawberry Premium Products. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        function showPage(pageId) {
+            // Hide all pages
+            const pages = document.querySelectorAll('.page');
+            pages.forEach(page => {
+                page.classList.remove('active');
+            });
+            
+            // Show selected page
+            document.getElementById(pageId).classList.add('active');
+            
+            // Update navigation
+            const navLinks = document.querySelectorAll('.nav-link');
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+            });
+            
+            // Find and activate the corresponding nav link
+            const activeLink = Array.from(navLinks).find(link => 
+                link.getAttribute('onclick').includes(pageId)
+            );
+            if (activeLink) {
+                activeLink.classList.add('active');
+            }
+            
+            // Scroll to top smoothly
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function openModal(modalId) {
+            document.getElementById(modalId).classList.add('active');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+
+        function handleContactSubmit(event) {
+            event.preventDefault();
+            
+            const button = event.target.querySelector('button[type="submit"]');
+            const originalText = button.innerHTML;
+            
+            button.innerHTML = 'Sending...';
+            button.disabled = true;
+            
+            setTimeout(() => {
+                alert('Thank you for your message! We\'ll get back to you within 24 hours.\n\nNote: This is a demo contact form. In a real website, your message would be sent to our team.');
+                button.innerHTML = originalText;
+                button.disabled = false;
+                event.target.reset();
+            }, 2000);
+        }
+
+        function handleCustomerInfo(event) {
+            event.preventDefault();
+            
+            const button = event.target.querySelector('button[type="submit"]');
+            const originalText = button.innerHTML;
+            
+            button.innerHTML = 'Processing...';
+            button.disabled = true;
+            
+            setTimeout(() => {
+                alert('Customer information submitted successfully!\n\nYour preferences have been saved to your profile.');
+                button.innerHTML = originalText;
+                button.disabled = false;
+                event.target.reset();
+                closeModal('customerModal');
+            }, 1500);
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modals = document.querySelectorAll('.modal');
+            modals.forEach(modal => {
+                if (event.target === modal) {
+                    modal.classList.remove('active');
+                }
+            });
+        }
+
+        // Smooth animations on scroll
+        document.addEventListener('DOMContentLoaded', function() {
+            const cards = document.querySelectorAll('.product-card');
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach((entry, index) => {
+                    if (entry.isIntersecting) {
+                        setTimeout(() => {
+                            entry.target.style.opacity = '1';
+                            entry.target.style.transform = 'translateY(0)';
+                        }, index * 100);
+                    }
+                });
+            }, {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            });
+            
+            cards.forEach(card => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(30px)';
+                card.style.transition = 'opacity 0.6s ease-out, transform 0.6s ease-out';
+                observer.observe(card);
+            });
+        });
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'97e014a8a07d5446',t:'MTc1NzY4NzE5NS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
